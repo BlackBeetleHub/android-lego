@@ -8,6 +8,7 @@ class Account {
 class User {
     companion object {
         var ID: String = "not"
+        var Email: String = "not"
     }
 }
 
