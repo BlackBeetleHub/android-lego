@@ -1,5 +1,6 @@
 package com.example.kirill.myapplication
 
+import android.annotation.SuppressLint
 import android.app.Fragment
 import android.content.Context
 import android.os.Bundle
@@ -12,7 +13,6 @@ import android.widget.TextView
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
-import com.google.gson.Gson
 import kotlinx.coroutines.experimental.async
 
 
@@ -27,32 +27,33 @@ class UserWordContext : Fragment() {
         return myView
     }
 
-    fun showWords(rawList: String) {
+    @SuppressLint("SetTextI18n")
+    fun handleRawKnownUserWords(rawList: String) {
         try {
-            var gson = Gson()
-            var parser: Parser = Parser()
-            val stringBuilder: StringBuilder = StringBuilder(rawList)
-            val jsonList: JsonArray<JsonObject> = parser.parse(stringBuilder) as JsonArray<JsonObject>
-            var listWord :MutableList<Word> = arrayListOf()
-            jsonList.forEach {
-                el -> listWord.add(Word(el.get("Word_id").toString(), el.get("Word_value").toString()))
+            var stringToJsonParser: Parser = Parser()
+            val rawUserWordsStringBuilders: StringBuilder = StringBuilder(rawList)
+            val jsonList: JsonArray<JsonObject> =
+                    stringToJsonParser.parse(rawUserWordsStringBuilders) as JsonArray<JsonObject>
+            var listWord: MutableList<Word> = arrayListOf()
+            jsonList.forEach { el ->
+                listWord.add(Word(
+                        el.get("Word_id").toString(),
+                        el.get("Word_value").toString()
+                ))
             }
             val lv = activity.findViewById<ListView>(R.id.listWordView)
             lv.adapter = WordAdapter(activity, listWord)
-        }catch (ex:Exception){
+        } catch (ex: Exception) {
             var errView = activity.findViewById<TextView>(R.id.textView2)
-            errView.setText("Something wrong try sing in again...")
+            errView.text = "Something wrong try sing in again..."
         }
-
     }
 
     override fun onStart() {
         super.onStart()
-        var list: List<String> = listOf("One", "Second", "Three")
-        var stringBuilder: String
         async {
             NetworkManager.getAllCustomKnownWords(User.ID, { str ->
-                showWords(str)
+                handleRawKnownUserWords(str)
             })
         }
     }
@@ -97,7 +98,7 @@ class UserWordContext : Fragment() {
     }
 
     private class ListRowHolder(row: View?) {
-        public val label: TextView
+        val label: TextView
 
         init {
             this.label = row!!.findViewById<TextView>(R.id.wordValueView) as TextView

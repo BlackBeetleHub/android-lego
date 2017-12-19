@@ -1,9 +1,5 @@
 package com.example.kirill.myapplication
 
-/**
- * Created by kirill on 18.12.17.
- */
-
 class Account {
     var accountID :String = ""
     var token :String = ""
@@ -23,6 +19,4 @@ class Word(id: String, value: String) {
         Word_id = id
         Word_value = value
     }
-
-
 }
